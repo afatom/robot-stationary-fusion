@@ -1,0 +1,29 @@
+# ROS 2 Build Artifacts
+build/
+install/
+log/
+*.o
+*.a
+*.so
+CMakeCache.txt
+cmake_install.cmake
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+*.pyc
+__pycache__/
+
+# Test Outputs
+test_results/
+*.gtest.xml
+
+# Local Environment
+.env
+*.local

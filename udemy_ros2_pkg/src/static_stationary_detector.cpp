@@ -6,40 +6,40 @@
 #include "static_stationary_detector.hpp"
 
 
-PreallocatedRingBuffer::PreallocatedRingBuffer() : capacity_(0), head_(0), size_(0) {}
+// PreallocatedRingBuffer::PreallocatedRingBuffer() : capacity_(0), head_(0), size_(0) {}
 
-// Explicit reserve step executed exclusively at initialization
-void PreallocatedRingBuffer::init(size_t capacity) {
-    capacity_ = capacity;
-    buffer_.resize(capacity); // Allocate memory ONCE at boot
-    head_ = 0;
-    size_ = 0;
-}
+// // Explicit reserve step executed exclusively at initialization
+// void PreallocatedRingBuffer::init(size_t capacity) {
+//     capacity_ = capacity;
+//     buffer_.resize(capacity); // Allocate memory ONCE at boot
+//     head_ = 0;
+//     size_ = 0;
+// }
 
-void PreallocatedRingBuffer::push(double value, double timestamp) {
-    if (capacity_ == 0) return;
+// void PreallocatedRingBuffer::push(double value, double timestamp) {
+//     if (capacity_ == 0) return;
 
-    buffer_[head_] = {value, timestamp};
-    head_ = (head_ + 1) % capacity_; // Circular wrap
+//     buffer_[head_] = {value, timestamp};
+//     head_ = (head_ + 1) % capacity_; // Circular wrap
 
-    if (size_ < capacity_) {
-        size_++;
-    }
-}
+//     if (size_ < capacity_) {
+//         size_++;
+//     }
+// }
 
-// Safe indexed access relative to the oldest active sample in the queue
-StaticTimeStampedValue PreallocatedRingBuffer::get_relative(size_t index) const {
-    if (index >= size_) return StaticTimeStampedValue();
+// // Safe indexed access relative to the oldest active sample in the queue
+// StaticTimeStampedValue PreallocatedRingBuffer::get_relative(size_t index) const {
+//     if (index >= size_) return StaticTimeStampedValue();
 
-    // Locate chronological slot based on whether the buffer has wrapped or not
-    size_t start_idx = 0;
-    if (size_ == capacity_) {
-        start_idx = head_; // When full, head points to the oldest un-overwritten item
-    }
+//     // Locate chronological slot based on whether the buffer has wrapped or not
+//     size_t start_idx = 0;
+//     if (size_ == capacity_) {
+//         start_idx = head_; // When full, head points to the oldest un-overwritten item
+//     }
 
-    size_t target_idx = (start_idx + index) % capacity_;
-    return buffer_[target_idx];
-}
+//     size_t target_idx = (start_idx + index) % capacity_;
+//     return buffer_[target_idx];
+// }
 
 
 

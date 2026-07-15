@@ -4,34 +4,35 @@
 #include <cmath>
 #include <numeric>
 #include <algorithm>
+#include "spsc_ring_buffer.hpp"
 
-struct StaticTimeStampedValue {
-    double value = 0.0;
-    double timestamp = 0.0;
-};
+// struct StaticTimeStampedValue {
+//     double value = 0.0;
+//     double timestamp = 0.0;
+// };
 
-// Fixed-capacity Ring Buffer using a contiguous preallocated vector
-class PreallocatedRingBuffer {
-public:
-    PreallocatedRingBuffer();
+// // Fixed-capacity Ring Buffer using a contiguous preallocated vector
+// class PreallocatedRingBuffer {
+// public:
+//     PreallocatedRingBuffer();
 
-    // Explicit reserve step executed exclusively at initialization
-    void init(size_t capacity);
+//     // Explicit reserve step executed exclusively at initialization
+//     void init(size_t capacity);
 
-    void push(double value, double timestamp);
+//     void push(double value, double timestamp);
 
-    size_t size() const { return size_; }
-    size_t capacity() const { return capacity_; }
+//     size_t size() const { return size_; }
+//     size_t capacity() const { return capacity_; }
 
-    // Safe indexed access relative to the oldest active sample in the queue
-    StaticTimeStampedValue get_relative(size_t index) const;
+//     // Safe indexed access relative to the oldest active sample in the queue
+//     StaticTimeStampedValue get_relative(size_t index) const;
 
-private:
-    std::vector<StaticTimeStampedValue> buffer_;
-    size_t capacity_;
-    size_t head_;
-    size_t size_;
-};
+// private:
+//     std::vector<StaticTimeStampedValue> buffer_;
+//     size_t capacity_;
+//     size_t head_;
+//     size_t size_;
+// };
 
 class StaticStationaryDetector {
 public:
@@ -53,6 +54,8 @@ private:
     double velocity_th_;
     double variance_th_;
 
-    PreallocatedRingBuffer odom_buffer_;
-    PreallocatedRingBuffer range_buffer_;
+    SpscRingBuffer odom_buffer_;
+    SpscRingBuffer range_buffer_;
+    // PreallocatedRingBuffer odom_buffer_;
+    // PreallocatedRingBuffer range_buffer_;
 };

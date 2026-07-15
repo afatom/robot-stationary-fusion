@@ -27,9 +27,9 @@ def generate_launch_description():
             executable="stationary_detector_publisher",
             name="hardened_sensor_fusion_node",
             parameters=[
-                {"window_duration_sec": 0.5},
-                {"velocity_threshold" : 0.02},
-                {"range_variance_threshold" : 0.0005},
+                {"window_duration_sec": 0.3}, # 0.5
+                {"velocity_threshold" : 0.2}, # 0.02
+                {"range_variance_threshold" : 0.05}, # 0.0005
                 {"fusion_loop_rate_hz" : 25.0},
                 {"expected_odom_hz" : 30.0},
                 {"expected_range_hz" : 20.0},

@@ -19,7 +19,7 @@ find_package(nav_msgs REQUIRED)
 # add_executable(publisher src/publisher.cpp)
 add_executable(range_publisher_demo src/range_publisher_demo.cpp src/range_publisher_demo_main.cpp)
 add_executable(odometer_publisher_demo src/odometer_publisher_demo.cpp src/odometer_publisher_demo_main.cpp)
-add_executable(stationary_detector_publisher src/stationary_detector_publisher.cpp src/spsc_ring_buffer.cpp src/stationary_detector_publisher_main.cpp)
+add_executable(stationary_detector_publisher src/stationary_detector_publisher.cpp)
 add_executable(robot_status_subscriber_simulator src/robot_status_subscriber_simulator.cpp)
 
 

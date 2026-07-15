@@ -9,7 +9,7 @@ This repository implements a **robust sensor fusion system** for a mobile robot 
 
 The fusion algorithm runs deterministically at a fixed rate (25 Hz) and publishes boolean status (`true` = stationary, `false` = moving) on the `/robot_state/is_stationary` topic.
 
-**Target Application**: Maytronics robotics platform (autonomous pool cleaning robot)
+**Target Application**: Autonomous pool cleaning robot
 
 ---
 
@@ -303,8 +303,8 @@ colcon build
 
 ### Build Specific Package
 ```bash
-colcon build --packages-select udemy_ros2_pkg
-colcon build --packages-select sensors_fusion_test
+colcon build --packages-select udemy_ros2_pkg --cmake-clean-cache
+colcon build --packages-select sensors_fusion_test --cmake-clean-cache
 ```
 
 ### Clean Build (if needed)
@@ -312,7 +312,12 @@ colcon build --packages-select sensors_fusion_test
 cd ~/ros2_ws
 rm -rf build/ install/ log/
 colcon build
+
+# Or with cmake-clean-cache
+colcon build --packages-select udemy_ros2_pkg --cmake-clean-cache
+colcon build --packages-select sensors_fusion_test --cmake-clean-cache
 ```
+
 
 ### Build Verbosity (Troubleshooting)
 ```bash
@@ -524,208 +529,4 @@ TestAcousticSensorSimulatorB.TestNodeBadParamsInjection1. OK
 │   │   └── odometer_publisher_test.cpp       # Odometry sensor tests
 │   └── include/
 │       └── sensors_fusion_test/
-```
-
----
-
-## GitHub Submission Guide
-
-### 1. Initialize Git Repository
-```bash
-cd ~/ros2_ws/src
-git init
-git config user.name "Your Name"
-git config user.email "your.email@example.com"
-```
-
-### 2. Create .gitignore
-```bash
-cat > .gitignore << 'EOF'
-# ROS 2 Build Artifacts
-build/
-install/
-log/
-*.o
-*.a
-*.so
-CMakeCache.txt
-cmake_install.cmake
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-*.pyc
-__pycache__/
-
-# Test Outputs
-test_results/
-*.gtest.xml
-
-# Local Environment
-.env
-*.local
-EOF
-```
-
-### 3. Create Git Commit
-```bash
-git add -A
-git commit -m "Initial commit: Sensor fusion system for robot stationary detection"
-```
-
-### 4. Create GitHub Repository
-- Go to https://github.com/new
-- Create repository (e.g., `robot-stationary-fusion`)
-- Choose: Public (for reviewers)
-- Do NOT initialize with README.md (we have one)
-
-### 5. Push to GitHub
-```bash
-git remote add origin https://github.com/<your-username>/robot-stationary-fusion.git
-git branch -M main
-git push -u origin main
-```
-
-### 6. Verify on GitHub
-- Check: All files present
-- Check: README.md displays correctly
-- Check: Source code properly formatted
-
----
-
-## Usage Example: Complete Workflow
-
-### Terminal 1: Build Everything
-```bash
-cd ~/ros2_ws
-source /opt/ros/jazzy/setup.bash
-colcon build
-source install/setup.bash
-```
-
-### Terminal 2: Run Tests
-```bash
-cd ~/ros2_ws
-source install/setup.bash
-colcon test --packages-select sensors_fusion_test
-colcon test-result --all --verbose
-```
-
-### Terminal 3: Launch All Nodes
-```bash
-cd ~/ros2_ws
-source install/setup.bash
-ros2 launch udemy_ros2_pkg sensors_fusion.launch.py
-```
-
-### Terminal 4: Monitor Output (in separate terminal)
-```bash
-cd ~/ros2_ws
-source install/setup.bash
-
-# Watch fusion decisions
-ros2 topic echo /robot_state/is_stationary
-
-# Or in another terminal, check message rates
-ros2 topic hz /robot_state/is_stationary
-```
-
-### Terminal 5: Debug Subscriber
-```bash
-cd ~/ros2_ws
-source install/setup.bash
-ros2 run udemy_ros2_pkg robot_status_subscriber_simulator
-```
-
----
-
-## Troubleshooting
-
-| Issue | Solution |
-|-------|----------|
-| `Package 'udemy_ros2_pkg' not found` | Run `source install/setup.bash` after build |
-| `CMake Error: Could not find ROS package` | Install dependencies: `sudo apt install ros-jazzy-*-msgs` |
-| `Tests fail with 'ekf.csv not found'` | Ensure absolute path in test: `/home/.../ekf_test.csv` |
-| `Topic messages not arriving` | Check node is running: `ros2 node list` |
-| `High latency on `/robot_state/is_stationary`` | Increase `fusion_loop_rate_hz` parameter |
-| `False "moving" detections** | Lower `range_variance_threshold` or increase `window_duration_sec` |
-
----
-
-## Performance Characteristics
-
-| Metric | Value | Notes |
-|--------|-------|-------|
-| **Worst-Case Decision Latency** | 40 ms | 1/25 Hz timer + callback delay |
-| **Memory Allocation (Runtime)** | 0 bytes | All buffers pre-allocated |
-| **Ring Buffer Push Complexity** | O(1) | Constant time write |
-| **Fusion Decision Complexity** | O(n) | Linear in window sample count (~15-30 samples typical) |
-| **CPU Usage (Typical)** | <5% | Single core, Intel i7 |
-| **Power Consumption** | Negligible | Designed for embedded systems |
-
----
-
-## Future Enhancements
-
-- [ ] Template-based ring buffer for generic data types
-- [ ] Power-of-2 sizing with bitwise AND masking (embedded optimization)
-- [ ] External buffer injection (pre-allocated memory region)
-- [ ] Adaptive thresholds based on sensor noise statistics
-- [ ] ROS 2 parameter callback for dynamic reconfiguration
-- [ ] Extended Kalman Filter fusion (vs. current variance-based)
-- [ ] Multi-range sensor support (sonar array)
-
----
-
-## References
-
-- ROS 2 Documentation: https://docs.ros.org/
-- Sensor Fusion Techniques: "Fundamentals of Kalman Filtering" (Welch & Bishop)
-- Ring Buffer Design: Embedded Systems best practices
-- Dataset: EKF telemetry from Maytronics pool cleaning robot
-
----
-
-## Contact & Attribution
-
-**Author**: Adham (for Maytronics Robotics Interview)  
-**Email**: fa.adam@aol.com  
-**Date**: July 2026
-
----
-
-**License**: TODO (Add appropriate open-source license)
-
----
-
-## Appendix: Parameter Tuning Guide
-
-### Conservative Setup (High Confidence, Slower Response)
-```bash
-window_duration_sec=1.0           # 1 second history
-velocity_threshold=0.01           # Very strict on motion
-range_variance_threshold=0.0002   # Very strict on distance change
-fusion_loop_rate_hz=10.0          # Slower decision rate
-```
-
-### Aggressive Setup (Fast Response, More False Positives)
-```bash
-window_duration_sec=0.2           # 200ms history only
-velocity_threshold=0.10           # Tolerates slow drift
-range_variance_threshold=0.002    # Tolerates sensor noise
-fusion_loop_rate_hz=50.0          # Faster decisions
-```
-
-### Balanced Setup (Default, Recommended)
-```bash
-window_duration_sec=0.5
-velocity_threshold=0.02
-range_variance_threshold=0.0005
-fusion_loop_rate_hz=25.0
 ```

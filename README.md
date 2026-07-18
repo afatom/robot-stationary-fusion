@@ -41,8 +41,8 @@ flowchart LR
    RTopic["/peak_detection/channel_0/range"]
    OTopic["/odometry/filtered"]
    HFN["HardenedSensorFusionNode"]
-   RBuf["Range ring buffer\nSPSCQueue<StaticTimeStampedValue>"]
-   OBuf["Odometry ring buffer\nSPSCQueue<StaticTimeStampedValue>"]
+   RBuf(("Range Ring Buffer<br/>SPSCQueue<StaticTimeStampedValue>"))
+   OBuf(("Odometry Ring Buffer<br/>SPSCQueue<StaticTimeStampedValue>"))
    Det["StaticStationaryDetector\nwindow + ratio/variance + hysteresis"]
    Out["/robot_state/is_stationary\nstd_msgs/Bool"]
 
@@ -72,8 +72,8 @@ flowchart TB
          end
       end
 
-      RB["range_buffer_\nSPSC ring buffer"]
-      OB["odom_buffer_\nSPSC ring buffer"]
+      RB(("range_buffer_<br/>SPSC ring buffer"))
+      OB(("odom_buffer_<br/>SPSC ring buffer"))
       SD["StaticStationaryDetector::isStationary(now)"]
       PUB["Publisher: /robot_state/is_stationary"]
    end

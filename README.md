@@ -41,19 +41,31 @@ flowchart LR
    RTopic["/peak_detection/channel_0/range"]
    OTopic["/odometry/filtered"]
    HFN["HardenedSensorFusionNode"]
-   RBuf(("Range Ring Buffer<br/>SPSCQueue<StaticTimeStampedValue>"))
-   OBuf(("Odometry Ring Buffer<br/>SPSCQueue<StaticTimeStampedValue>"))
    Det["StaticStationaryDetector\nwindow + ratio/variance + hysteresis"]
    Out["/robot_state/is_stationary\nstd_msgs/Bool"]
+
+      subgraph RBuf["Range Ring Buffer (SPSCQueue)"]
+         direction LR
+         RR0(("0")) --> RR1(("1")) --> RR2(("2")) --> RR3(("3")) --> RR0
+         RRH["head"] -.-> RR1
+         RRT["tail"] -.-> RR3
+      end
+
+      subgraph OBuf["Odometry Ring Buffer (SPSCQueue)"]
+         direction LR
+         OO0(("0")) --> OO1(("1")) --> OO2(("2")) --> OO3(("3")) --> OO0
+         OOH["head"] -.-> OO1
+         OOT["tail"] -.-> OO3
+      end
 
    CSV --> RNode
    CSV --> ONode
    RNode --> RTopic --> HFN
    ONode --> OTopic --> HFN
-   HFN --> RBuf
-   HFN --> OBuf
-   RBuf --> Det
-   OBuf --> Det
+      HFN --> RR0
+      HFN --> OO0
+      RR2 --> Det
+      OO2 --> Det
    Det --> Out
 ```
 
@@ -72,19 +84,31 @@ flowchart TB
          end
       end
 
-      RB(("range_buffer_<br/>SPSC ring buffer"))
-      OB(("odom_buffer_<br/>SPSC ring buffer"))
+      subgraph RB["range_buffer_ (SPSC ring)"]
+         direction LR
+         RB0(("0")) --> RB1(("1")) --> RB2(("2")) --> RB3(("3")) --> RB0
+         RBH["head"] -.-> RB1
+         RBT["tail"] -.-> RB3
+      end
+
+      subgraph OB["odom_buffer_ (SPSC ring)"]
+         direction LR
+         OB0(("0")) --> OB1(("1")) --> OB2(("2")) --> OB3(("3")) --> OB0
+         OBH["head"] -.-> OB1
+         OBT["tail"] -.-> OB3
+      end
+
       SD["StaticStationaryDetector::isStationary(now)"]
       PUB["Publisher: /robot_state/is_stationary"]
    end
 
    RN -->|"Range msg"| CG1
    ON -->|"Odometry msg"| CG2
-   CG1 --> RB
-   CG2 --> OB
+   CG1 --> RB0
+   CG2 --> OB0
    CG3 --> SD
-   RB --> SD
-   OB --> SD
+   RB2 --> SD
+   OB2 --> SD
    SD --> PUB
 ```
 

@@ -9,8 +9,6 @@
 #include "udemy_ros2_pkg/sensor_fusion_gconstants.hpp"
 
 using namespace std::chrono_literals;
-constexpr int DEFAULT_ODOM_TX_PERIOD_MSEC = 1000;
-
 
 
 OdometerSensorSimulator::OdometerSensorSimulator(const rclcpp::NodeOptions & options)
@@ -97,7 +95,9 @@ void OdometerSensorSimulator::timerCallback() {
     odom_msg.pose.pose.position.y = current_data.pos_y;
     odom_msg.pose.pose.position.z = current_data.pos_z;
 
-    // 3. Convert Euler coordinates to Quaternion configuration
+    // 3. Convert Euler coordinates to Quaternion configuration (the way of getting the new cordinates x,y,z after a rotation in 3D space)
+    // we use the helper function to convert the Euler angles (roll, pitch, yaw) to a quaternion representation for the orientation of the
+    // robot in 3D space. This is necessary because ROS uses quaternions to represent orientations to avoid issues like gimbal lock that can occur with Euler angles.
     eulerToQuaternion(current_data.roll, current_data.pitch, current_data.yaw, odom_msg.pose.pose.orientation);
 
     // 4. Fill Pose Covariance matrix (6x6 row-major flat layout)

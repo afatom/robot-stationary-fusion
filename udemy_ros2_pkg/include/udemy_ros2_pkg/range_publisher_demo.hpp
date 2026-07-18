@@ -11,8 +11,8 @@ public:
 private:
     void timerCallback();
 private:
-    std::string csv_path_;
-    double sensor_freq_;
+    std::string csv_path_; //can be dropped
+    double sensor_freq_; //can be dropped
     CSVTelemetryReader csv_reader_;
     rclcpp::Publisher<sensor_msgs::msg::Range>::SharedPtr range_pub_;
     rclcpp::TimerBase::SharedPtr timer_;

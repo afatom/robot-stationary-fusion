@@ -33,6 +33,7 @@ public:
      * @note Producer Thread Only.
      */
     bool push(const T& item) {
+        // memory_order_relaxed: Guarantees only that the modification to the variable itself is atomic
         const auto current_tail = tail_.load(std::memory_order_relaxed);
         const auto current_head = head_.load(std::memory_order_acquire);
 
@@ -42,6 +43,7 @@ public:
         }
 
         buffer_[current_tail & mask_] = item;
+        // release store ensures all memory writes made here are visible to the consumer thread that does an acquire load
         tail_.store(current_tail + 1, std::memory_order_release);
         return true;
     }
@@ -81,6 +83,13 @@ public:
         return true;
     }
 
+    /**
+     * @brief Returns the item at the given index relative to the head of the queue.
+     * @param index The index of the item to retrieve, where 0 is the oldest item, 1 is the next oldest, and so on.
+     * @note The index must be less than the current size of the queue.
+     * @return The item at the specified index, or a default-constructed T if out of bounds.
+     * @note Consumer Thread Only.
+     */
     T get_relative(size_t index) const {
         const auto current_head = head_.load(std::memory_order_acquire);
         const auto current_tail = tail_.load(std::memory_order_acquire);

@@ -88,7 +88,7 @@ public:
 
         try {
             PoolRobotTelemetry data;
-            data.time      = std::stod(columns[0]);
+            data.time      = std::stod(columns[0]); //converts a string to a double
             data.pos_x     = std::stod(columns[1]);
             data.pos_y     = std::stod(columns[2]);
             data.pos_z     = std::stod(columns[3]);

@@ -14,8 +14,8 @@ private:
     void eulerToQuaternion(double roll, double pitch, double yaw, 
                         geometry_msgs::msg::Quaternion& q);
 private:
-    std::string csv_path_;
-    double sensor_freq_;
+    std::string csv_path_; //can be dropped
+    double sensor_freq_; //can be dropped
     CSVTelemetryReader csv_reader_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
     rclcpp::TimerBase::SharedPtr timer_;

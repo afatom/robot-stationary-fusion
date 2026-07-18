@@ -14,12 +14,18 @@ find_package(nav_msgs REQUIRED)
 
 
 
-
+include_directories(
+  include
+  # ${rclcpp_INCLUDE_DIRS}
+  # ${std_msgs_INCLUDE_DIRS}
+  # ${sensor_msgs_INCLUDE_DIRS}
+  # ${nav_msgs_INCLUDE_DIRS}
+)
 # create executables 
 # add_executable(publisher src/publisher.cpp)
-add_executable(range_publisher_demo src/range_publisher_demo.cpp src/range_publisher_demo_main.cpp)
-add_executable(odometer_publisher_demo src/odometer_publisher_demo.cpp src/odometer_publisher_demo_main.cpp)
-add_executable(stationary_detector_publisher src/stationary_detector_publisher.cpp)
+# add_executable(range_publisher_demo src/range_publisher_demo.cpp)
+# add_executable(odometer_publisher_demo src/odometer_publisher_demo.cpp)
+add_executable(stationary_detector_publisher src/stationary_detector_publisher.cpp src/odometer_publisher_demo.cpp src/range_publisher_demo.cpp)
 add_executable(robot_status_subscriber_simulator src/robot_status_subscriber_simulator.cpp)
 
 
@@ -33,16 +39,14 @@ add_executable(robot_status_subscriber_simulator src/robot_status_subscriber_sim
 # ament_target_dependencies(rpm_subscriber rclcpp std_msgs)
 # ament_target_dependencies(rpm_publisher rclcpp std_msgs)
 
-ament_target_dependencies(range_publisher_demo rclcpp sensor_msgs)
-ament_target_dependencies(odometer_publisher_demo rclcpp nav_msgs)
+# ament_target_dependencies(range_publisher_demo rclcpp sensor_msgs)
+# ament_target_dependencies(odometer_publisher_demo rclcpp nav_msgs)
 ament_target_dependencies(stationary_detector_publisher rclcpp nav_msgs sensor_msgs std_msgs)
 ament_target_dependencies(robot_status_subscriber_simulator rclcpp nav_msgs sensor_msgs std_msgs)
 
 
 # config for ROS2 cli tools  
 install(TARGETS
-  range_publisher_demo
-  odometer_publisher_demo
   stationary_detector_publisher
   robot_status_subscriber_simulator
   DESTINATION lib/${PROJECT_NAME})

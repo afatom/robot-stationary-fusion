@@ -18,13 +18,37 @@ if(BUILD_TESTING)
   find_package(sensor_msgs REQUIRED)
   find_package(nav_msgs REQUIRED)
 
+  ament_add_gtest(${PROJECT_NAME}_spsc_queue_test ./test/spsc_queue_test.cpp)
+  ament_add_gtest(${PROJECT_NAME}_stationary_detector_test ./test/stationary_detector_test.cpp)
   ament_add_gtest(${PROJECT_NAME}_range_publisher_test ./test/range_publisher_test.cpp)
   ament_add_gtest(${PROJECT_NAME}_odometer_publisher_test ./test/odometer_publisher_test.cpp)
-  target_include_directories(${PROJECT_NAME}_range_publisher_test PUBLIC
+
+  set(UDMYPKG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../udemy_ros2_pkg/include)
+  set(UDMYPKG_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../udemy_ros2_pkg/src)
+
+  target_include_directories(${PROJECT_NAME}_spsc_queue_test PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../udemy_ros2_pkg/src>
+    $<BUILD_INTERFACE:${UDMYPKG_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>
   )
+  target_include_directories(${PROJECT_NAME}_stationary_detector_test PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${UDMYPKG_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:include>
+  )
+  target_include_directories(${PROJECT_NAME}_range_publisher_test PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${UDMYPKG_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${UDMYPKG_SRC_DIR}>
+    $<INSTALL_INTERFACE:include>
+  )
+  target_include_directories(${PROJECT_NAME}_odometer_publisher_test PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${UDMYPKG_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${UDMYPKG_SRC_DIR}>
+    $<INSTALL_INTERFACE:include>
+  )
+
   # Compile the implementation directly into the test
   target_sources(${PROJECT_NAME}_range_publisher_test PRIVATE ../../udemy_ros2_pkg/src/range_publisher_demo.cpp)
   target_sources(${PROJECT_NAME}_odometer_publisher_test PRIVATE ../../udemy_ros2_pkg/src/odometer_publisher_demo.cpp)

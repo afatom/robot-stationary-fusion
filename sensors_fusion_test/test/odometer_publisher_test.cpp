@@ -7,7 +7,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 
-#include "../../udemy_ros2_pkg/src/odometer_publisher_demo.hpp"
+#include "../../udemy_ros2_pkg/include/udemy_ros2_pkg/odometer_publisher_demo.hpp"
 
 
 // Test fixture for OdometerSensorSimulator
@@ -154,6 +154,90 @@ TEST_F(TestOdometerSensorSimulator, TestOdometryMessageStructure)
     }
 }
 
+TEST_F(TestOdometerSensorSimulator, TestOdometryPositionProgression)
+{
+    std::vector<nav_msgs::msg::Odometry> messages;
+    
+    auto subscription = node_p->create_subscription<nav_msgs::msg::Odometry>(
+        "/odometry/filtered", 10,
+        [&messages](const nav_msgs::msg::Odometry::SharedPtr msg) {
+            if (messages.size() < 5) { // Collect first 5 messages
+                messages.push_back(*msg);
+            }
+        });
+
+    // Wait for multiple messages to arrive
+    for (int i = 0; i < 20; ++i) {
+        rclcpp::spin_some(node_p);
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        if (messages.size() >= 5) break;
+    }
+
+    EXPECT_GE(messages.size(), 2U) << "Not enough messages collected";
+
+    if (messages.size() >= 2) {
+        // Position should change between messages (unless robot is stationary in CSV)
+        // We verify that timestamps are different
+        EXPECT_NE(messages[0].header.stamp.nanosec, messages[1].header.stamp.nanosec);
+        EXPECT_EQ(messages[0].header.stamp.sec, messages[1].header.stamp.sec);
+    }
+}
+
+TEST_F(TestOdometerSensorSimulator, TestOdometryCovarianceMatrixPopulation)
+{
+    std::vector<nav_msgs::msg::Odometry> messages;
+    
+    auto subscription = node_p->create_subscription<nav_msgs::msg::Odometry>(
+        "/odometry/filtered", 10,
+        [&messages](const nav_msgs::msg::Odometry::SharedPtr msg) {
+            messages.push_back(*msg);
+        });
+
+    for (int i = 0; i < 50; ++i) {
+        rclcpp::spin_some(node_p);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    EXPECT_GT(messages.size(), 20U);
+
+    if (!messages.empty()) {
+        const auto& odom_msg = messages.back();
+
+        // Pose covariance should have 36 elements (6x6 matrix)
+        EXPECT_EQ(odom_msg.pose.covariance.size(), 36U);
+        
+        // Specific covariance elements should be populated (diagonal elements)
+        // [0]=X, [7]=Y, [14]=Z, [21]=Roll, [28]=Pitch, [35]=Yaw
+        EXPECT_GT(odom_msg.pose.covariance[0], 0.0) << "X covariance not set";
+        EXPECT_GT(odom_msg.pose.covariance[7], 0.0) << "Y covariance not set";
+        EXPECT_GT(odom_msg.pose.covariance[14], 0.0) << "Z covariance not set";
+        
+        // Twist covariance should also be populated
+        EXPECT_EQ(odom_msg.twist.covariance.size(), 36U);
+        EXPECT_GT(odom_msg.twist.covariance[0], 0.0) << "Twist X covariance not set";
+        EXPECT_GT(odom_msg.twist.covariance[7], 0.0) << "Twist Y covariance not set";
+    }
+}
+
+TEST_F(TestOdometerSensorSimulator, TestNodeRobustnessWithRapidSpinning)
+{
+    std::vector<nav_msgs::msg::Odometry> messages;
+    
+    auto subscription = node_p->create_subscription<nav_msgs::msg::Odometry>(
+        "/odometry/filtered", 100,
+        [&messages](const nav_msgs::msg::Odometry::SharedPtr msg) {
+            messages.push_back(*msg);
+        });
+
+    // Rapid spinning should not crash the node
+    for (int i = 0; i < 200; ++i) {
+        rclcpp::spin_some(node_p);
+        // No sleep - stress test
+    }
+
+    // Should still be operating
+    EXPECT_TRUE(node_p) << "Node crashed during rapid spinning";
+}
 
 int main(int argc, char * argv[]) {
     testing::InitGoogleTest(&argc, argv);

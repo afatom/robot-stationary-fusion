@@ -1,22 +1,11 @@
+#include "udemy_ros2_pkg/range_publisher_demo.hpp"
+#include "udemy_ros2_pkg/sensor_fusion_gconstants.hpp"
+
 #include <chrono>
 #include <fstream>
-#include <iostream>
-#include <memory>
-#include <sstream>
 #include <string>
-#include <vector>
-#include <chrono>
-#include <functional>
-#include "sensor_fusion_gconstants.hpp"
-#include "range_publisher_demo.hpp"
 
 using namespace std::chrono_literals;
-
-constexpr unsigned CSV_TIME_COLUMN_IDX = 0;
-constexpr unsigned CSV_POS_Z_COLUMN_IDX = 3;
-constexpr unsigned CSV_DIST_FROM_SURFACE_COLUMN_IDX = 3;
-constexpr const char *CSV_FP="/home/adham/ros2_ws/src/udemy_ros2_pkg/src/ekf.csv";
-constexpr int DEFAULT_TX_PERIOD_MSEC = 1000;
 
 
 AcousticSensorSimulator::AcousticSensorSimulator(const rclcpp::NodeOptions & options)
@@ -25,7 +14,7 @@ AcousticSensorSimulator::AcousticSensorSimulator(const rclcpp::NodeOptions & opt
     this->declare_parameter<std::string>("csv_path", csv_path_default);
     this->declare_parameter<double>("range_sensor_freq_hz", 20.0);
     sensor_freq_ = this->get_parameter("range_sensor_freq_hz").as_double();
-    auto sensor_duration = std::chrono::duration<double>(1.0 / sensor_freq_);
+    auto sensor_duration = std::chrono::duration<double, std::ratio<1>>(1.0 / sensor_freq_);
 
     csv_path_ = this->get_parameter("csv_path").as_string();
 
@@ -86,9 +75,9 @@ void AcousticSensorSimulator::timerCallback() {
 
     // Fill standard Range configuration metadata
     range_msg.radiation_type = sensor_msgs::msg::Range::ULTRASOUND;
-    range_msg.field_of_view = 0.1; 
-    range_msg.min_range = 0.1;     
-    range_msg.max_range = 10.0;    
+    range_msg.field_of_view = sensor_fusion_gconstants::RANGE_SENSOR_FIELD_OF_VIEW_RAD;
+    range_msg.min_range = sensor_fusion_gconstants::RANGE_SENSOR_MIN_RANGE_M;
+    range_msg.max_range = sensor_fusion_gconstants::RANGE_SENSOR_MAX_RANGE_M;
     range_msg.range = simulated_range;
 
     range_pub_->publish(range_msg);

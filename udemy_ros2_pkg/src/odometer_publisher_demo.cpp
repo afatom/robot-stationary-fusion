@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "rclcpp/rclcpp.hpp"
-#include "odometer_publisher_demo.hpp"
-#include "sensor_fusion_gconstants.hpp"
+#include "udemy_ros2_pkg/odometer_publisher_demo.hpp"
+#include "udemy_ros2_pkg/sensor_fusion_gconstants.hpp"
 
 using namespace std::chrono_literals;
 constexpr int DEFAULT_ODOM_TX_PERIOD_MSEC = 1000;
@@ -15,11 +15,12 @@ constexpr int DEFAULT_ODOM_TX_PERIOD_MSEC = 1000;
 
 OdometerSensorSimulator::OdometerSensorSimulator(const rclcpp::NodeOptions & options)
 : Node("odometer_sensor_simulator", options) {
-    this->declare_parameter<std::string>("csv_path", "ekf.csv");
+    std::string csv_path_default = "/home/adham/ros2_ws/src/udemy_ros2_pkg/src/ekf.csv";
+    this->declare_parameter<std::string>("csv_path", csv_path_default);
     // this->declare_parameter<int>("odometer_sensor_tx_period", DEFAULT_ODOM_TX_PERIOD_MSEC);
     this->declare_parameter<double>("odometer_sensor_freq_hz", 30.0);
     sensor_freq_ = this->get_parameter("odometer_sensor_freq_hz").as_double();
-    auto sensor_duration = std::chrono::duration<double>(1.0 / sensor_freq_);
+    auto sensor_duration = std::chrono::duration<double, std::ratio<1>>(1.0 / sensor_freq_);
 
     csv_path_ = this->get_parameter("csv_path").as_string();
     //int sensor_tx_period = this->get_parameter("odometer_sensor_tx_period").as_int();

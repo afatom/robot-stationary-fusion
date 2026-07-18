@@ -161,6 +161,4 @@ private:
 
     SPSCQueue<StaticTimeStampedValue> odom_buffer_;
     SPSCQueue<StaticTimeStampedValue> range_buffer_;
-    // PreallocatedRingBuffer odom_buffer_;
-    // PreallocatedRingBuffer range_buffer_;
 };

@@ -134,9 +134,9 @@ TEST_F(TestAcousticSensorSimulator, TestRangeMessageStructure)
 
     EXPECT_EQ(msg.header.frame_id, "acoustic_sensor_link");
     EXPECT_EQ(msg.radiation_type, sensor_msgs::msg::Range::ULTRASOUND);
-    EXPECT_FLOAT_EQ(msg.field_of_view, sensor_fusion_gconstants::RANGE_SENSOR_FIELD_OF_VIEW_RAD);
-    EXPECT_FLOAT_EQ(msg.min_range, sensor_fusion_gconstants::RANGE_SENSOR_MIN_RANGE_M);
-    EXPECT_FLOAT_EQ(msg.max_range, sensor_fusion_gconstants::RANGE_SENSOR_MAX_RANGE_M);
+    EXPECT_FLOAT_EQ(msg.field_of_view, fusion_consts::RANGE_SENSOR_FIELD_OF_VIEW_RAD);
+    EXPECT_FLOAT_EQ(msg.min_range, fusion_consts::RANGE_SENSOR_MIN_RANGE_M);
+    EXPECT_FLOAT_EQ(msg.max_range, fusion_consts::RANGE_SENSOR_MAX_RANGE_M);
     EXPECT_TRUE(std::isfinite(msg.range));
     EXPECT_GT(msg.range, 0.0f);
     EXPECT_LE(msg.range, 10.0f);

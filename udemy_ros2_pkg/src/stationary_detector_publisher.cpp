@@ -35,7 +35,7 @@ public:
             duration = 0.5;
         }
         
-        // Safety multiplier (3x window requirement size) to comfortably accommodate jitter/burst packet arrivals
+        // Safety multiplier (4x window requirement size) to comfortably accommodate jitter/burst packet arrivals
         double expected_odom_hz = this->get_parameter("expected_odom_hz").as_double();
         double expected_range_hz = this->get_parameter("expected_range_hz").as_double();
         if (expected_odom_hz <= 0.0) {
@@ -49,14 +49,6 @@ public:
 
         size_t odom_capacity = static_cast<size_t>(expected_odom_hz * duration * 4.0);
         size_t range_capacity = static_cast<size_t>(expected_range_hz * duration * 4.0);
-
-        // Instantiation - Dynamic allocation strictly isolated to the initialization sequence
-        // double __velocity_th = this->get_parameter("velocity_threshold").as_double();
-        // double __variance_th = this->get_parameter("range_variance_threshold").as_double();
-        
-        // RCLCPP_INFO(this->get_logger(), "Static Stationary Detector initialized with velocity threshold %f.", __velocity_th);
-        // RCLCPP_INFO(this->get_logger(), "Static Stationary Detector initialized with range variance threshold %f.", __variance_th);
-        // RCLCPP_INFO(this->get_logger(), "Static Stationary Detector initialized with window duration %f.", duration);
 
         const double velocity_threshold = this->get_parameter("velocity_threshold").as_double();
         const double range_variance_threshold = this->get_parameter("range_variance_threshold").as_double();
@@ -176,5 +168,6 @@ int main(int argc, char * argv[]) {
     executor.add_node(sensor_fusion_node);
     executor.spin();
     rclcpp::shutdown();
+
     return 0;
 }

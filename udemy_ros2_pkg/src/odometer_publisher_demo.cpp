@@ -15,24 +15,21 @@ constexpr int DEFAULT_ODOM_TX_PERIOD_MSEC = 1000;
 
 OdometerSensorSimulator::OdometerSensorSimulator(const rclcpp::NodeOptions & options)
 : Node("odometer_sensor_simulator", options) {
-    std::string csv_path_default = "/home/adham/ros2_ws/src/udemy_ros2_pkg/src/ekf.csv";
-    this->declare_parameter<std::string>("csv_path", csv_path_default);
-    // this->declare_parameter<int>("odometer_sensor_tx_period", DEFAULT_ODOM_TX_PERIOD_MSEC);
+    this->declare_parameter<std::string>("csv_path", std::string(fusion_consts::EKF_CSV_DEFAULT_PATH));
     this->declare_parameter<double>("odometer_sensor_freq_hz", 30.0);
     sensor_freq_ = this->get_parameter("odometer_sensor_freq_hz").as_double();
     auto sensor_duration = std::chrono::duration<double, std::ratio<1>>(1.0 / sensor_freq_);
 
     csv_path_ = this->get_parameter("csv_path").as_string();
-    //int sensor_tx_period = this->get_parameter("odometer_sensor_tx_period").as_int();
     
     if (!csv_reader_.open(csv_path_)) {
         RCLCPP_ERROR(this->get_logger(), "Failed to open CSV telemetry data file: %s", csv_path_.c_str());
         return;
     }
 
-    if (sensor_freq_ < sensor_fusion_gconstants::ODOMETER_SENSOR_MIN_FREQ_HZ || sensor_freq_ > sensor_fusion_gconstants::ODOMETER_SENSOR_MAX_FREQ_HZ) {
+    if (sensor_freq_ < fusion_consts::ODOMETER_SENSOR_MIN_FREQ_HZ || sensor_freq_ > fusion_consts::ODOMETER_SENSOR_MAX_FREQ_HZ) {
         RCLCPP_ERROR(this->get_logger(), "Sensor frequency %f Hz is out of bounds [%d, %d] Hz. Please adjust the parameter.",
-                     sensor_freq_, sensor_fusion_gconstants::ODOMETER_SENSOR_MIN_FREQ_HZ, sensor_fusion_gconstants::ODOMETER_SENSOR_MAX_FREQ_HZ);
+                     sensor_freq_, fusion_consts::ODOMETER_SENSOR_MIN_FREQ_HZ, fusion_consts::ODOMETER_SENSOR_MAX_FREQ_HZ);
         return;
     }
 

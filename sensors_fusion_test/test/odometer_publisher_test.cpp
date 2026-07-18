@@ -108,11 +108,6 @@ TEST_F(TestOdometerSensorSimulator, TestHighFrequencyOperation)
     node.reset();
 }
 
-
-// // ============================================================================
-// // MESSAGE CONTENT VALIDATION TESTS
-// // ============================================================================
-
 TEST_F(TestOdometerSensorSimulator, TestOdometryMessageStructure)
 {
     // Collect published messages via subscription

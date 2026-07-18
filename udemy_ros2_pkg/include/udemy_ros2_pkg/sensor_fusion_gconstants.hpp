@@ -2,8 +2,7 @@
 
 #include <string_view> //min c++ ver c++17
 
-
-namespace sensor_fusion_gconstants
+namespace fusion_consts
 {
     constexpr std::string_view EKF_CSV_DEFAULT_PATH = "/home/adham/ros2_ws/src/udemy_ros2_pkg/src/ekf.csv";
     constexpr std::string_view EKF_TEST_CSV_DEFAULT_PATH = "/home/adham/ros2_ws/src/udemy_ros2_pkg/src/ekf_test.csv";

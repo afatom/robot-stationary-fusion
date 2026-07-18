@@ -10,8 +10,7 @@ using namespace std::chrono_literals;
 
 AcousticSensorSimulator::AcousticSensorSimulator(const rclcpp::NodeOptions & options)
 : Node("acoustic_sensor_publisher_simulator", options) {
-    std::string csv_path_default = "/home/adham/ros2_ws/src/udemy_ros2_pkg/src/ekf.csv";
-    this->declare_parameter<std::string>("csv_path", csv_path_default);
+    this->declare_parameter<std::string>("csv_path", std::string(fusion_consts::EKF_CSV_DEFAULT_PATH));
     this->declare_parameter<double>("range_sensor_freq_hz", 20.0);
     sensor_freq_ = this->get_parameter("range_sensor_freq_hz").as_double();
     auto sensor_duration = std::chrono::duration<double, std::ratio<1>>(1.0 / sensor_freq_);
@@ -24,9 +23,9 @@ AcousticSensorSimulator::AcousticSensorSimulator(const rclcpp::NodeOptions & opt
         return;
     }
 
-    if (sensor_freq_ < sensor_fusion_gconstants::RANGE_SENSOR_MIN_FREQ_HZ || sensor_freq_ > sensor_fusion_gconstants::RANGE_SENSOR_MAX_FREQ_HZ) {
+    if (sensor_freq_ < fusion_consts::RANGE_SENSOR_MIN_FREQ_HZ || sensor_freq_ > fusion_consts::RANGE_SENSOR_MAX_FREQ_HZ) {
         RCLCPP_ERROR(this->get_logger(), "Sensor frequency %f Hz is out of bounds [%d, %d] Hz. Please adjust the parameter.",
-                     sensor_freq_, sensor_fusion_gconstants::RANGE_SENSOR_MIN_FREQ_HZ, sensor_fusion_gconstants::RANGE_SENSOR_MAX_FREQ_HZ);
+                     sensor_freq_, fusion_consts::RANGE_SENSOR_MIN_FREQ_HZ, fusion_consts::RANGE_SENSOR_MAX_FREQ_HZ);
         return;
     }
 
@@ -75,9 +74,9 @@ void AcousticSensorSimulator::timerCallback() {
 
     // Fill standard Range configuration metadata
     range_msg.radiation_type = sensor_msgs::msg::Range::ULTRASOUND;
-    range_msg.field_of_view = sensor_fusion_gconstants::RANGE_SENSOR_FIELD_OF_VIEW_RAD;
-    range_msg.min_range = sensor_fusion_gconstants::RANGE_SENSOR_MIN_RANGE_M;
-    range_msg.max_range = sensor_fusion_gconstants::RANGE_SENSOR_MAX_RANGE_M;
+    range_msg.field_of_view = fusion_consts::RANGE_SENSOR_FIELD_OF_VIEW_RAD;
+    range_msg.min_range = fusion_consts::RANGE_SENSOR_MIN_RANGE_M;
+    range_msg.max_range = fusion_consts::RANGE_SENSOR_MAX_RANGE_M;
     range_msg.range = simulated_range;
 
     range_pub_->publish(range_msg);
